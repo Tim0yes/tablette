@@ -269,6 +269,8 @@ function openApp(a){
   var steps=[];
   (a.pkgs||[]).forEach(function(p){steps.push(intentPkg(p))});
   (a.actions||[]).forEach(function(x){steps.push(intentAct(x))});
+  // Si l'app manque, le site s'ouvre dans un vrai navigateur (la connexion y marche mieux que dans Fully)
+  if(a.web) CONFIG.navigateurs.forEach(function(p){steps.push(intentView(a.web,p))});
   tryChain(steps,a.nom,a.web);
 }
 function openWeb(url){
