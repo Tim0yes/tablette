@@ -211,7 +211,8 @@ var CONFIG = {
   apps: [
     {nom:"TikTok Studio", sous:"Créer & analyser", ic:"🎬", style:"g-studio", pkgs:["com.ss.android.tt.creator"], web:"https://www.tiktok.com/tiktokstudio"},
     {nom:"TikTok",        sous:"Tendances",        ic:"♪",  style:"g-tt",     pkgs:["com.zhiliaoapp.musically","com.ss.android.ugc.trill"], web:"https://www.tiktok.com"},
-    {nom:"Etsy Vendeur",  sous:"Ma boutique",      ic:"🧡", style:"g-etsy",   pkgs:["com.etsy.android.soe","com.etsy.android"], web:"https://www.etsy.com/your/shops/me"},
+    // L'app Etsy Vendeur n'est pas compatible avec Android 7 : on ouvre directement le site
+    {nom:"Etsy",          sous:"Ma boutique",      ic:"🧡", style:"g-etsy",   pkgs:[], web:"https://www.etsy.com/your/shops/me"},
     {nom:"Caméra",        sous:"Prendre une photo",ic:"📷", style:"g-cam",    pkgs:["net.sourceforge.opencamera"], actions:["android.media.action.STILL_IMAGE_CAMERA"]},
     {nom:"Play Store",    sous:"Applications",     ic:"▶",  style:"g-store",  pkgs:["com.android.vending"], web:"https://play.google.com/store/apps"},
     {nom:"Navigateur",    sous:"Google Chrome",    ic:"🌐", style:"g-web",    pkgs:["com.android.chrome","org.lineageos.jelly"], web:"https://www.google.fr"},
