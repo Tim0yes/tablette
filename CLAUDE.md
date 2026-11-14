@@ -47,6 +47,12 @@ sur une **Samsung Galaxy Tab A 2016 (SM-T280)** fixée comme console centrale.
 - L'utilisateur ne veut **pas** rendre le dépôt privé (on reste sur GitHub Pages public).
 - Clavier AZERTY : réglage Android (Langues et saisie), pas dans la page.
 
+## Listes partagées avec Claude (v5)
+- Les listes peuvent être stockées dans **Home Assistant** (Raspberry Pi, HA OS, Duck DNS + NGINX SSL) : `todo.idees_videos` et `todo.a_faire_etsy` (intégration Local To-do). La console les lit/écrit via l'API REST (`/api/services/todo/get_items?return_response`, `add_item`, `update_item`, `remove_item`).
+- L'adresse HA et le jeton longue durée sont entrés **sur la tablette** (bouton ⚙ de « Mes listes ») et gardés dans `localStorage` (clé `ha`) — **jamais dans le code** (dépôt public). Cache : `cache-idees` / `cache-etsy`. Sans réglage, on reste sur `list-idees` / `list-etsy`.
+- HA doit autoriser l'origine `https://tim0yes.github.io` (CORS, Réglages → Système → Réseau).
+- Réponses de Claude = champ **description** de l'élément, affiché sous l'idée avec 🤖. Tâche programmée `reponses-listes-tablette` (tous les jours 9 h, sur le PC, app Claude ouverte).
+
 ## Historique
 - Premier support envisagé : iPad 2 (A1395), abandonné (ne s'allume plus).
 - La version locale `file:///sdcard/console.html` existe encore sur la tablette mais n'est plus utilisée.
