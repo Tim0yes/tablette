@@ -35,8 +35,17 @@ sur une **Samsung Galaxy Tab A 2016 (SM-T280)** fixée comme console centrale.
 
 ## Workflow de modification
 1. Modifier `index.html`.
-2. Vérifier le rendu à 1280×800 (ex. Playwright) avant de pousser.
-3. Commit + push sur `main`. Dire à l'utilisateur de tirer l'écran vers le bas pour recharger (ou attendre l'auto-reload).
+2. **Changer `var VERSION = "..."`** en haut du script (ex. `v5 · 15 nov.`). Indispensable : la console compare ce texte toutes les 5 min avec la version en ligne et se recharge seule si elle diffère (la tablette garde sinon l'ancienne page en cache — GitHub Pages sert `max-age=600` et Fully ne recharge pas tout seul). La version s'affiche en haut à droite : demander à l'utilisateur ce qu'il voit pour confirmer.
+3. Vérifier le rendu à 1280×800 avant de pousser.
+4. Commit + push sur `main` (dépôt : `https://github.com/Tim0yes/tablette.git`). La mise à jour arrive sur la tablette en ~5–15 min.
+
+## Choses apprises (nov. 2026)
+- L'app **Etsy Vendeur n'est pas compatible** avec Android 7 (« This app won't work for your device ») : la tuile Etsy ouvre directement le site.
+- Les sites (Etsy…) chargés **dans Fully** gèrent mal la connexion : tout lien web passe d'abord par Chrome puis le navigateur LineageOS (`org.lineageos.jelly`), Fully seulement en dernier recours.
+- Chaque tuile essaie `pkgs` puis `actions` puis `web` dans l'ordre (fonction `tryChain`) ; une étape est considérée ratée si la console est encore au premier plan après 3 s.
+- Le verrouillage « impossible de sortir de Fully » demande **Fully Plus** (payant) ; l'épinglage d'écran Android bloquerait les tuiles. L'utilisateur n'a pas encore décidé.
+- L'utilisateur ne veut **pas** rendre le dépôt privé (on reste sur GitHub Pages public).
+- Clavier AZERTY : réglage Android (Langues et saisie), pas dans la page.
 
 ## Historique
 - Premier support envisagé : iPad 2 (A1395), abandonné (ne s'allume plus).
