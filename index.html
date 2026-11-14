@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Console</title>
+<style>
+  :root{
+    --bg:#0b0b12; --card:#15151f; --card2:#1c1c29; --line:#2a2a3b;
+    --txt:#f2f2f7; --mute:#8d8da3;
+    --pink:#ff2d6f; --cyan:#25f4ee; --orange:#f56400; --lime:#b6ff3b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%;background:var(--bg);color:var(--txt);
+    font-family:"Roboto","Segoe UI",system-ui,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none}
+  body{background:
+      radial-gradient(1200px 600px at -10% -20%, rgba(255,45,111,.18), transparent 60%),
+      radial-gradient(900px 600px at 110% 120%, rgba(37,244,238,.14), transparent 60%),
+      var(--bg)}
+  .app{height:100%;display:grid;gap:14px;padding:16px;
+    grid-template-columns:1.05fr 1.6fr 1.05fr;grid-template-rows:auto 1fr}
+  .card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);
+    border-radius:22px;padding:16px;position:relative;overflow:hidden}
+  .label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);font-weight:600}
+
+  /* ---------- Bandeau ---------- */
+  .top{grid-column:1/-1;display:flex;align-items:center;gap:22px;padding:14px 20px}
+  .clock{font-size:64px;font-weight:200;letter-spacing:-2px;line-height:1;font-variant-numeric:tabular-nums}
+  .clock b{font-weight:600}
+  .date{font-size:15px;color:var(--mute);margin-top:4px;text-transform:capitalize}
+  .sep{width:1px;align-self:stretch;background:var(--line)}
+  .weather{display:flex;align-items:center;gap:12px;cursor:pointer}
+  .wicon{font-size:38px}
+  .wtemp{font-size:30px;font-weight:300}
+  .wcity{font-size:12px;color:var(--mute)}
+  .spacer{flex:1}
+  .brand{text-align:right}
+  .brand .name{font-size:22px;font-weight:800;letter-spacing:-.5px}
+  .brand .name span{background:linear-gradient(90deg,var(--cyan),var(--pink));-webkit-background-clip:text;color:transparent}
+  .brand .sub{font-size:12px;color:var(--mute)}
+
+  /* ---------- Colonne TikTok ---------- */
+  .tt{display:flex;flex-direction:column;gap:12px}
+  .tt::before{content:"";position:absolute;inset:-40% -40% auto auto;width:220px;height:220px;
+    background:radial-gradient(circle,rgba(37,244,238,.25),transparent 70%)}
+  .count{font-size:46px;font-weight:300;font-variant-numeric:tabular-nums;line-height:1}
+  .count small{display:block;font-size:14px;color:var(--mute);margin-top:6px;letter-spacing:0}
+  .week{display:flex;gap:6px;margin-top:6px}
+  .day{flex:1;text-align:center;font-size:11px;color:var(--mute)}
+  .dot{height:34px;border-radius:10px;background:#20202e;margin-bottom:4px;display:flex;align-items:center;justify-content:center;font-size:15px}
+  .dot.ok{background:linear-gradient(135deg,var(--cyan),var(--pink));color:#000}
+  .dot.today{outline:2px solid var(--txt)}
+  .streak{font-size:13px;color:var(--mute)}
+  .streak b{color:var(--txt);font-size:18px}
+  .bar{height:8px;border-radius:8px;background:#23233a;overflow:hidden}
+  .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--cyan),var(--pink));border-radius:8px}
+  .status{font-size:13px;color:var(--mute)}
+  .status b{color:var(--lime)}
+
+  /* ---------- Grille d'apps ---------- */
+  .apps{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;gap:12px;padding:12px}
+  .tile{border-radius:20px;display:flex;flex-direction:column;justify-content:space-between;padding:14px;
+    cursor:pointer;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.06);
+    transition:transform .12s ease}
+  .tile:active{transform:scale(.95)}
+  .tile .ic{font-size:30px;line-height:1}
+  .tile .t{font-size:15px;font-weight:700}
+  .tile .s{font-size:11px;opacity:.75}
+  .g-tt{background:linear-gradient(135deg,#111 0%,#1d1d2b 100%)}
+  .g-tt::after{content:"";position:absolute;right:-20px;bottom:-20px;width:90px;height:90px;border-radius:50%;
+    box-shadow:-6px -4px 0 var(--cyan),6px 4px 0 var(--pink);opacity:.35}
+  .g-studio{background:linear-gradient(135deg,#ff2d6f,#a51e7a)}
+  .g-etsy{background:linear-gradient(135deg,#f56400,#c2410c)}
+  .g-cam{background:linear-gradient(135deg,#3b82f6,#1e3a8a)}
+  .g-store{background:linear-gradient(135deg,#10b981,#065f46)}
+  .g-web{background:linear-gradient(135deg,#6366f1,#3730a3)}
+  .g-set{background:linear-gradient(135deg,#3a3a4d,#22222f)}
+
+  /* ---------- Colonne Etsy + listes ---------- */
+  .right{display:flex;flex-direction:column;gap:14px;min-height:0}
+  .etsy::before{content:"";position:absolute;inset:auto auto -50% -30%;width:220px;height:220px;
+    background:radial-gradient(circle,rgba(245,100,0,.25),transparent 70%)}
+  .links{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+  .lk{background:rgba(245,100,0,.12);border:1px solid rgba(245,100,0,.35);color:#ffb37a;border-radius:12px;
+    padding:10px 8px;font-size:13px;font-weight:600;text-align:center;cursor:pointer}
+  .lk:active{background:rgba(245,100,0,.3)}
+  .notes{flex:1;display:flex;flex-direction:column;min-height:0}
+  .tabs{display:flex;gap:6px;margin-top:8px}
+  .tab{flex:1;padding:8px;border-radius:10px;text-align:center;font-size:12px;font-weight:700;
+    background:#20202e;color:var(--mute);cursor:pointer}
+  .tab.on{background:var(--txt);color:var(--bg)}
+  .list{flex:1;overflow:auto;margin-top:10px;display:flex;flex-direction:column;gap:6px}
+  .item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:12px;background:#1a1a27;font-size:14px}
+  .item .ck{width:20px;height:20px;border-radius:6px;border:2px solid var(--mute);flex:none;cursor:pointer}
+  .item.done .ck{background:var(--lime);border-color:var(--lime)}
+  .item.done span{text-decoration:line-through;color:var(--mute)}
+  .item span{flex:1}
+  .item .x{color:var(--mute);cursor:pointer;padding:0 4px;font-size:18px}
+  .add{display:flex;gap:6px;margin-top:8px}
+  .add input{flex:1;background:#1a1a27;border:1px solid var(--line);border-radius:12px;color:var(--txt);
+    padding:10px;font-size:14px;outline:none}
+  .add button,.btn{background:var(--txt);color:var(--bg);border:0;border-radius:12px;padding:0 14px;font-weight:800;font-size:18px}
+  .empty{color:var(--mute);font-size:13px;text-align:center;padding:16px 0}
+
+  /* ---------- Fenêtre ville ---------- */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center}
+  .modal.on{display:flex}
+  .modal .box{background:var(--card2);border:1px solid var(--line);border-radius:20px;padding:20px;width:340px}
+  .modal input{width:100%;margin:12px 0;background:#11111a;border:1px solid var(--line);border-radius:12px;
+    color:var(--txt);padding:12px;font-size:16px;outline:none}
+  .modal .row{display:flex;gap:8px;justify-content:flex-end}
+  .modal .btn{padding:10px 16px;font-size:14px}
+  .modal .btn.ghost{background:transparent;color:var(--mute)}
+
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#000c;border:1px solid var(--line);
+    padding:10px 16px;border-radius:12px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none}
+  .toast.on{opacity:1}
+
+  /* Portrait */
+  @media (orientation:portrait){
+    .app{grid-template-columns:1fr 1fr;grid-template-rows:auto auto 1fr auto}
+    .apps{grid-column:1/-1;grid-row:3}
+    .tt{grid-column:1;grid-row:2}
+    .right{grid-column:2;grid-row:2}
+    .notes{min-height:220px}
+    .clock{font-size:52px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Bandeau -->
+  <div class="card top">
+    <div>
+      <div class="clock" id="clock">--:--</div>
+      <div class="date" id="date"></div>
+    </div>
+    <div class="sep"></div>
+    <div class="weather" id="weather" title="Toucher pour changer de ville">
+      <div class="wicon" id="wicon">⛅</div>
+      <div>
+        <div class="wtemp" id="wtemp">--°</div>
+        <div class="wcity" id="wcity">Météo</div>
+      </div>
+    </div>
+    <div class="spacer"></div>
+    <div class="brand">
+      <div class="name">Console <span>1fo.utile</span></div>
+      <div class="sub" id="greet">Bonjour</div>
+    </div>
+  </div>
+
+  <!-- TikTok -->
+  <div class="card tt">
+    <div class="label">Prochaine vidéo TikTok</div>
+    <div class="count" id="count">--:--<small>avant 18 h</small></div>
+    <div class="bar"><i id="bar" style="width:0%"></i></div>
+    <div class="status" id="ttstatus">Publication quotidienne à 18 h 00</div>
+    <div class="label" style="margin-top:8px">Cette semaine</div>
+    <div class="week" id="week"></div>
+    <div class="streak" id="streak"></div>
+    <div class="spacer"></div>
+    <div class="label">Accès rapide</div>
+    <div class="links" style="margin-top:0">
+      <div class="lk" style="background:rgba(37,244,238,.1);border-color:rgba(37,244,238,.35);color:#9ffcf9" data-web="https://www.tiktok.com/tiktokstudio/analytics">Statistiques</div>
+      <div class="lk" style="background:rgba(255,45,111,.1);border-color:rgba(255,45,111,.35);color:#ff9dbb" data-web="https://www.tiktok.com/tiktokstudio/comment">Commentaires</div>
+    </div>
+  </div>
+
+  <!-- Applications -->
+  <div class="card apps" id="apps"></div>
+
+  <!-- Etsy + listes -->
+  <div class="right">
+    <div class="card etsy">
+      <div class="label">Boutique Etsy</div>
+      <div class="links">
+        <div class="lk" data-web="https://www.etsy.com/your/orders/sold">📦 Commandes</div>
+        <div class="lk" data-web="https://www.etsy.com/messages">💬 Messages</div>
+        <div class="lk" data-web="https://www.etsy.com/your/shops/me/stats">📈 Stats</div>
+        <div class="lk" data-web="https://www.etsy.com/your/shops/me/tools/listings">🏷️ Annonces</div>
+      </div>
+    </div>
+    <div class="card notes">
+      <div class="label">Mes listes</div>
+      <div class="tabs">
+        <div class="tab on" data-list="idees">🎬 Idées vidéos</div>
+        <div class="tab" data-list="etsy">🧡 À faire Etsy</div>
+      </div>
+      <div class="list" id="list"></div>
+      <div class="add">
+        <input id="newItem" placeholder="Ajouter…" maxlength="80">
+        <button id="addBtn">+</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="box">
+    <div class="label">Ville pour la météo</div>
+    <input id="cityInput" placeholder="ex. Lyon">
+    <div class="row">
+      <button class="btn ghost" id="cancelCity">Annuler</button>
+      <button class="btn" id="saveCity">OK</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* =========================================================
+   RÉGLAGES — modifie ici si besoin
+   ========================================================= */
+var CONFIG = {
+  heurePublication: 18,          // heure de la vidéo TikTok du jour
+  villeParDefaut: "Paris",
+  apps: [
+    {nom:"TikTok Studio", sous:"Créer & analyser", ic:"🎬", style:"g-studio", pkg:"com.ss.android.tt.creator", web:"https://www.tiktok.com/tiktokstudio"},
+    {nom:"TikTok",        sous:"Tendances",        ic:"♪",  style:"g-tt",     pkg:"com.zhiliaoapp.musically", web:"https://www.tiktok.com"},
+    {nom:"Etsy Vendeur",  sous:"Ma boutique",      ic:"🧡", style:"g-etsy",   pkg:"com.etsy.android.soe",     web:"https://www.etsy.com/your/shops/me"},
+    {nom:"Caméra",        sous:"Open Camera",      ic:"📷", style:"g-cam",    pkg:"net.sourceforge.opencamera"},
+    {nom:"Play Store",    sous:"Applications",     ic:"▶",  style:"g-store",  pkg:"com.android.vending"},
+    {nom:"Navigateur",    sous:"Internet",         ic:"🌐", style:"g-web",    pkg:"com.android.chrome", web:"https://www.google.fr"},
+    {nom:"Réglages",      sous:"Tablette",         ic:"⚙️", style:"g-set",    pkg:"com.android.settings"}
+  ]
+};
+/* ========================================================= */
+
+var $ = function(id){return document.getElementById(id)};
+var isAndroid = /Android/i.test(navigator.userAgent);
+
+function store(k,v){try{ if(v===undefined) return JSON.parse(localStorage.getItem(k)); localStorage.setItem(k,JSON.stringify(v)); }catch(e){ return null; }}
+function toast(msg){var t=$("toast");t.textContent=msg;t.classList.add("on");clearTimeout(toast._t);toast._t=setTimeout(function(){t.classList.remove("on")},2200)}
+function pad(n){return (n<10?"0":"")+n}
+
+/* ---------- Lancer une app / un lien ---------- */
+function openApp(a){
+  if(isAndroid && a.pkg){
+    var fb = a.web ? ";S.browser_fallback_url="+encodeURIComponent(a.web) : "";
+    location.href = "intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package="+a.pkg+fb+";end";
+  } else if(a.web){ window.open(a.web,"_blank"); }
+  else toast(a.nom+" s'ouvre sur la tablette");
+}
+function openWeb(url){
+  if(isAndroid){ location.href="intent:"+url.replace(/^https?:/,"")+"#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url="+encodeURIComponent(url)+";end"; }
+  else window.open(url,"_blank");
+}
+
+/* ---------- Tuiles ---------- */
+(function(){
+  var box=$("apps");
+  CONFIG.apps.forEach(function(a){
+    var d=document.createElement("div");
+    d.className="tile "+a.style;
+    d.innerHTML='<div class="ic">'+a.ic+'</div><div><div class="t">'+a.nom+'</div><div class="s">'+a.sous+'</div></div>';
+    d.onclick=function(){openApp(a)};
+    box.appendChild(d);
+  });
+  // Tuile "Toutes les apps"
+  var all=document.createElement("div");
+  all.className="tile g-set";
+  all.innerHTML='<div class="ic">⋯</div><div><div class="t">Toutes</div><div class="s">les applications</div></div>';
+  all.onclick=function(){ if(window.fully && fully.showLauncher){fully.showLauncher()} else if(isAndroid){location.href="fully://launcher"} else toast("Ouvre la liste des apps sur la tablette")};
+  box.appendChild(all);
+  // Bonus : 9e case = Fichiers
+  var f={nom:"Fichiers",sous:"Stockage",ic:"🗂️",style:"g-set",pkg:"com.android.documentsui"};
+  var d=document.createElement("div");d.className="tile g-set";
+  d.innerHTML='<div class="ic">'+f.ic+'</div><div><div class="t">'+f.nom+'</div><div class="s">'+f.sous+'</div></div>';
+  d.onclick=function(){openApp(f)};box.appendChild(d);
+})();
+Array.prototype.forEach.call(document.querySelectorAll("[data-web]"),function(el){
+  el.onclick=function(){openWeb(el.getAttribute("data-web"))};
+});
+
+/* ---------- Horloge + compte à rebours ---------- */
+var JOURS=["dimanche","lundi","mardi","mercredi","jeudi","vendredi","samedi"];
+var MOIS=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"];
+function tick(){
+  var n=new Date(), h=n.getHours(), m=n.getMinutes();
+  $("clock").innerHTML="<b>"+pad(h)+"</b>:"+pad(m);
+  $("date").textContent=JOURS[n.getDay()]+" "+n.getDate()+" "+MOIS[n.getMonth()];
+  $("greet").textContent = h<6?"Bonne nuit":h<12?"Bonjour":h<18?"Bon après-midi":"Bonsoir";
+
+  var target=new Date(n); target.setHours(CONFIG.heurePublication,0,0,0);
+  var publishedToday = n>=target;
+  if(publishedToday) target.setDate(target.getDate()+1);
+  var diff=Math.max(0,target-n), hh=Math.floor(diff/3600000), mm=Math.floor(diff%3600000/60000);
+  $("count").innerHTML=hh+" h "+pad(mm)+"<small>"+(publishedToday?"avant demain 18 h":"avant 18 h")+"</small>";
+  var pct=100-(diff/86400000*100);
+  $("bar").style.width=pct.toFixed(1)+"%";
+  var key="pub-"+n.toDateString();
+  var done=store(key);
+  $("ttstatus").innerHTML = done ? "✅ <b>Vidéo du jour publiée</b>" :
+    (publishedToday ? "⏰ Vidéo du jour pas encore cochée · touche ici quand c'est publié" : "Publication quotidienne à "+CONFIG.heurePublication+" h 00 · touche quand c'est fait");
+  renderWeek();
+}
+$("ttstatus").onclick=function(){var k="pub-"+new Date().toDateString();store(k,!store(k));tick();toast(store(k)?"Bravo, vidéo publiée 🎉":"Statut réinitialisé")};
+tick(); setInterval(tick,10000);
+
+function renderWeek(){
+  var box=$("week"); if(!box) return; box.innerHTML="";
+  var n=new Date(), L=["D","L","M","M","J","V","S"];
+  for(var i=6;i>=0;i--){
+    var d=new Date(n); d.setDate(n.getDate()-i);
+    var ok=store("pub-"+d.toDateString());
+    var el=document.createElement("div"); el.className="day";
+    el.innerHTML='<div class="dot'+(ok?' ok':'')+(i===0?' today':'')+'">'+(ok?'✓':'')+'</div>'+L[d.getDay()];
+    box.appendChild(el);
+  }
+  var s=0, d2=new Date(n); if(!store("pub-"+d2.toDateString())) d2.setDate(d2.getDate()-1);
+  while(store("pub-"+d2.toDateString())){s++; d2.setDate(d2.getDate()-1)}
+  $("streak").innerHTML = s ? "🔥 Série en cours : <b>"+s+"</b> jour"+(s>1?"s":"") : "Coche ta vidéo du jour pour lancer ta série 🔥";
+}
+
+/* ---------- Météo (Open-Meteo, sans clé) ---------- */
+var WMO={0:"☀️",1:"🌤️",2:"⛅",3:"☁️",45:"🌫️",48:"🌫️",51:"🌦️",53:"🌦️",55:"🌧️",61:"🌧️",63:"🌧️",65:"🌧️",71:"🌨️",73:"🌨️",75:"❄️",80:"🌦️",81:"🌧️",82:"⛈️",95:"⛈️",96:"⛈️",99:"⛈️"};
+function loadWeather(){
+  var c=store("city")||{name:CONFIG.villeParDefaut,lat:48.8566,lon:2.3522};
+  $("wcity").textContent=c.name;
+  fetch("https://api.open-meteo.com/v1/forecast?latitude="+c.lat+"&longitude="+c.lon+"&current=temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=1")
+    .then(function(r){return r.json()}).then(function(d){
+      $("wtemp").textContent=Math.round(d.current.temperature_2m)+"°";
+      $("wicon").textContent=WMO[d.current.weather_code]||"🌡️";
+      $("wcity").textContent=c.name+" · "+Math.round(d.daily.temperature_2m_min[0])+"° / "+Math.round(d.daily.temperature_2m_max[0])+"°";
+    }).catch(function(){ $("wcity").textContent=c.name+" · hors ligne"; });
+}
+$("weather").onclick=function(){$("modal").classList.add("on");$("cityInput").value="";$("cityInput").focus()};
+$("cancelCity").onclick=function(){$("modal").classList.remove("on")};
+$("saveCity").onclick=function(){
+  var q=$("cityInput").value.trim(); if(!q) return;
+  fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&language=fr&name="+encodeURIComponent(q))
+    .then(function(r){return r.json()}).then(function(d){
+      if(!d.results||!d.results.length){toast("Ville introuvable");return}
+      var r=d.results[0]; store("city",{name:r.name,lat:r.latitude,lon:r.longitude});
+      $("modal").classList.remove("on"); loadWeather(); toast("Météo : "+r.name);
+    }).catch(function(){toast("Pas de connexion")});
+};
+loadWeather(); setInterval(loadWeather,30*60000);
+
+/* ---------- Listes (sauvegardées sur la tablette) ---------- */
+var current="idees";
+function getList(){return store("list-"+current)||[]}
+function saveList(l){store("list-"+current,l)}
+function render(){
+  var l=getList(), box=$("list"); box.innerHTML="";
+  if(!l.length){box.innerHTML='<div class="empty">'+(current==="idees"?"Note ici tes idées de recettes 🍳":"Colis à envoyer, annonces à créer…")+'</div>';return}
+  l.forEach(function(it,i){
+    var d=document.createElement("div"); d.className="item"+(it.d?" done":"");
+    d.innerHTML='<div class="ck"></div><span></span><div class="x">×</div>';
+    d.querySelector("span").textContent=it.t;
+    d.querySelector(".ck").onclick=function(){l[i].d=!l[i].d;saveList(l);render()};
+    d.querySelector(".x").onclick=function(){l.splice(i,1);saveList(l);render()};
+    box.appendChild(d);
+  });
+}
+function addItem(){var v=$("newItem").value.trim(); if(!v) return; var l=getList(); l.unshift({t:v,d:false}); saveList(l); $("newItem").value=""; render()}
+$("addBtn").onclick=addItem;
+$("newItem").onkeydown=function(e){if(e.key==="Enter"||e.keyCode===13) addItem()};
+Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(t){
+  t.onclick=function(){
+    Array.prototype.forEach.call(document.querySelectorAll(".tab"),function(x){x.classList.remove("on")});
+    t.classList.add("on"); current=t.getAttribute("data-list"); render();
+  };
+});
+render();
+</script>
+</body>
+</html>
