@@ -13,14 +13,12 @@
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
   html,body{height:100%;background:var(--bg);color:var(--txt);
     font-family:"Roboto","Segoe UI",system-ui,sans-serif;overflow:hidden;user-select:none;-webkit-user-select:none}
-  body{background:
-      radial-gradient(1200px 600px at -10% -20%, rgba(255,45,111,.18), transparent 60%),
-      radial-gradient(900px 600px at 110% 120%, rgba(37,244,238,.14), transparent 60%),
-      var(--bg)}
+  /* Mode léger : fonds unis, pas de halos ni d'animations (tablette peu puissante) */
+  body{background:var(--bg)}
   .app{height:100%;display:grid;gap:14px;padding:16px;
     grid-template-columns:1.05fr 1.6fr 1.05fr;grid-template-rows:auto 1fr}
-  .card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);
-    border-radius:22px;padding:16px;position:relative;overflow:hidden}
+  .card{background:var(--card);border:1px solid var(--line);
+    border-radius:22px;padding:16px;position:relative;contain:layout paint}
   .label{font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute);font-weight:600}
 
   /* ---------- Bandeau ---------- */
@@ -36,13 +34,11 @@
   .spacer{flex:1}
   .brand{text-align:right}
   .brand .name{font-size:22px;font-weight:800;letter-spacing:-.5px}
-  .brand .name span{background:linear-gradient(90deg,var(--cyan),var(--pink));-webkit-background-clip:text;color:transparent}
+  .brand .name span{color:var(--cyan)}
   .brand .sub{font-size:12px;color:var(--mute)}
 
   /* ---------- Colonne TikTok ---------- */
   .tt{display:flex;flex-direction:column;gap:12px}
-  .tt::before{content:"";position:absolute;inset:-40% -40% auto auto;width:220px;height:220px;
-    background:radial-gradient(circle,rgba(37,244,238,.25),transparent 70%)}
   .count{font-size:46px;font-weight:300;font-variant-numeric:tabular-nums;line-height:1}
   .count small{display:block;font-size:14px;color:var(--mute);margin-top:6px;letter-spacing:0}
   .week{display:flex;gap:6px;margin-top:6px}
@@ -60,26 +56,21 @@
   /* ---------- Grille d'apps ---------- */
   .apps{display:grid;grid-template-columns:repeat(3,1fr);grid-auto-rows:1fr;gap:12px;padding:12px}
   .tile{border-radius:20px;display:flex;flex-direction:column;justify-content:space-between;padding:14px;
-    cursor:pointer;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.06);
-    transition:transform .12s ease}
-  .tile:active{transform:scale(.95)}
+    cursor:pointer;position:relative;border:1px solid rgba(255,255,255,.06)}
+  .tile:active{opacity:.6}
   .tile .ic{font-size:30px;line-height:1}
   .tile .t{font-size:15px;font-weight:700}
   .tile .s{font-size:11px;opacity:.75}
-  .g-tt{background:linear-gradient(135deg,#111 0%,#1d1d2b 100%)}
-  .g-tt::after{content:"";position:absolute;right:-20px;bottom:-20px;width:90px;height:90px;border-radius:50%;
-    box-shadow:-6px -4px 0 var(--cyan),6px 4px 0 var(--pink);opacity:.35}
-  .g-studio{background:linear-gradient(135deg,#ff2d6f,#a51e7a)}
-  .g-etsy{background:linear-gradient(135deg,#f56400,#c2410c)}
-  .g-cam{background:linear-gradient(135deg,#3b82f6,#1e3a8a)}
-  .g-store{background:linear-gradient(135deg,#10b981,#065f46)}
-  .g-web{background:linear-gradient(135deg,#6366f1,#3730a3)}
-  .g-set{background:linear-gradient(135deg,#3a3a4d,#22222f)}
+  .g-tt{background:#1a1a26;border-color:rgba(37,244,238,.35)}
+  .g-studio{background:#d4266a}
+  .g-etsy{background:#e05a00}
+  .g-cam{background:#2c5fc4}
+  .g-store{background:#0e8f66}
+  .g-web{background:#4c4fd0}
+  .g-set{background:#2e2e3e}
 
   /* ---------- Colonne Etsy + listes ---------- */
   .right{display:flex;flex-direction:column;gap:14px;min-height:0}
-  .etsy::before{content:"";position:absolute;inset:auto auto -50% -30%;width:220px;height:220px;
-    background:radial-gradient(circle,rgba(245,100,0,.25),transparent 70%)}
   .links{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
   .lk{background:rgba(245,100,0,.12);border:1px solid rgba(245,100,0,.35);color:#ffb37a;border-radius:12px;
     padding:10px 8px;font-size:13px;font-weight:600;text-align:center;cursor:pointer}
@@ -112,9 +103,9 @@
   .modal .btn{padding:10px 16px;font-size:14px}
   .modal .btn.ghost{background:transparent;color:var(--mute)}
 
-  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#000c;border:1px solid var(--line);
-    padding:10px 16px;border-radius:12px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none}
-  .toast.on{opacity:1}
+  .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:#000;border:1px solid var(--line);
+    padding:10px 16px;border-radius:12px;font-size:13px;display:none;pointer-events:none}
+  .toast.on{display:block}
 
   /* Portrait */
   @media (orientation:portrait){
@@ -216,15 +207,18 @@
 var CONFIG = {
   heurePublication: 18,          // heure de la vidéo TikTok du jour
   villeParDefaut: "Paris",
+  // Chaque app essaie ses "pkgs" dans l'ordre, puis ses "actions", puis "web".
   apps: [
-    {nom:"TikTok Studio", sous:"Créer & analyser", ic:"🎬", style:"g-studio", pkg:"com.ss.android.tt.creator", web:"https://www.tiktok.com/tiktokstudio"},
-    {nom:"TikTok",        sous:"Tendances",        ic:"♪",  style:"g-tt",     pkg:"com.zhiliaoapp.musically", web:"https://www.tiktok.com"},
-    {nom:"Etsy Vendeur",  sous:"Ma boutique",      ic:"🧡", style:"g-etsy",   pkg:"com.etsy.android.soe",     web:"https://www.etsy.com/your/shops/me"},
-    {nom:"Caméra",        sous:"Open Camera",      ic:"📷", style:"g-cam",    pkg:"net.sourceforge.opencamera"},
-    {nom:"Play Store",    sous:"Applications",     ic:"▶",  style:"g-store",  pkg:"com.android.vending"},
-    {nom:"Navigateur",    sous:"Internet",         ic:"🌐", style:"g-web",    pkg:"com.android.chrome", web:"https://www.google.fr"},
-    {nom:"Réglages",      sous:"Tablette",         ic:"⚙️", style:"g-set",    pkg:"com.android.settings"}
-  ]
+    {nom:"TikTok Studio", sous:"Créer & analyser", ic:"🎬", style:"g-studio", pkgs:["com.ss.android.tt.creator"], web:"https://www.tiktok.com/tiktokstudio"},
+    {nom:"TikTok",        sous:"Tendances",        ic:"♪",  style:"g-tt",     pkgs:["com.zhiliaoapp.musically","com.ss.android.ugc.trill"], web:"https://www.tiktok.com"},
+    {nom:"Etsy Vendeur",  sous:"Ma boutique",      ic:"🧡", style:"g-etsy",   pkgs:["com.etsy.android.soe","com.etsy.android"], web:"https://www.etsy.com/your/shops/me"},
+    {nom:"Caméra",        sous:"Prendre une photo",ic:"📷", style:"g-cam",    pkgs:["net.sourceforge.opencamera"], actions:["android.media.action.STILL_IMAGE_CAMERA"]},
+    {nom:"Play Store",    sous:"Applications",     ic:"▶",  style:"g-store",  pkgs:["com.android.vending"], web:"https://play.google.com/store/apps"},
+    {nom:"Navigateur",    sous:"Google Chrome",    ic:"🌐", style:"g-web",    pkgs:["com.android.chrome","org.lineageos.jelly"], web:"https://www.google.fr"},
+    {nom:"Réglages",      sous:"Tablette",         ic:"⚙️", style:"g-set",    pkgs:["com.android.settings"], actions:["android.settings.SETTINGS"]}
+  ],
+  // Navigateur utilisé pour les raccourcis (Commandes, Stats…)
+  navigateurs: ["com.android.chrome","org.lineageos.jelly"]
 };
 /* ========================================================= */
 
@@ -236,16 +230,50 @@ function toast(msg){var t=$("toast");t.textContent=msg;t.classList.add("on");cle
 function pad(n){return (n<10?"0":"")+n}
 
 /* ---------- Lancer une app / un lien ---------- */
+/* On essaie chaque façon d'ouvrir l'app l'une après l'autre : si la console
+   est toujours au premier plan 3 s plus tard, c'est que ça n'a pas marché,
+   on passe à la suivante. À la fin : le site web, ou un message. */
+var launching=false, leftPage=false;
+function markLeft(){leftPage=true}
+document.addEventListener("visibilitychange",function(){if(document.hidden) markLeft()});
+window.addEventListener("blur",markLeft);
+window.addEventListener("pagehide",markLeft);
+
+function intentPkg(p){return "intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package="+p+";end"}
+function intentAct(a){return "intent:#Intent;action="+a+";end"}
+function intentView(url,p){return "intent:"+url.replace(/^https?:/,"")+"#Intent;scheme=https;action=android.intent.action.VIEW"+(p?";package="+p:"")+";end"}
+
+function tryChain(steps,nom,web){
+  if(launching) return;
+  if(!isAndroid){ if(web) window.open(web,"_blank"); else toast(nom+" s'ouvre sur la tablette"); return; }
+  launching=true;
+  var i=0;
+  function next(){
+    if(i>=steps.length){
+      launching=false;
+      if(web){ toast("Ouverture du site "+nom+"…"); location.href=web; }
+      else toast(nom+" introuvable sur la tablette");
+      return;
+    }
+    leftPage=false;
+    try{ location.href=steps[i++]; }catch(e){}
+    setTimeout(function(){
+      if(leftPage||document.hidden){ launching=false; return; }
+      next();
+    },3000);
+  }
+  toast("Ouverture de "+nom+"…");
+  next();
+}
 function openApp(a){
-  if(isAndroid && a.pkg){
-    var fb = a.web ? ";S.browser_fallback_url="+encodeURIComponent(a.web) : "";
-    location.href = "intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;package="+a.pkg+fb+";end";
-  } else if(a.web){ window.open(a.web,"_blank"); }
-  else toast(a.nom+" s'ouvre sur la tablette");
+  var steps=[];
+  (a.pkgs||[]).forEach(function(p){steps.push(intentPkg(p))});
+  (a.actions||[]).forEach(function(x){steps.push(intentAct(x))});
+  tryChain(steps,a.nom,a.web);
 }
 function openWeb(url){
-  if(isAndroid){ location.href="intent:"+url.replace(/^https?:/,"")+"#Intent;scheme=https;package=com.android.chrome;S.browser_fallback_url="+encodeURIComponent(url)+";end"; }
-  else window.open(url,"_blank");
+  var steps=CONFIG.navigateurs.map(function(p){return intentView(url,p)});
+  tryChain(steps,"la page",url);
 }
 
 /* ---------- Tuiles ---------- */
@@ -265,7 +293,7 @@ function openWeb(url){
   all.onclick=function(){ if(window.fully && fully.showLauncher){fully.showLauncher()} else if(isAndroid){location.href="fully://launcher"} else toast("Ouvre la liste des apps sur la tablette")};
   box.appendChild(all);
   // Bonus : 9e case = Fichiers
-  var f={nom:"Fichiers",sous:"Stockage",ic:"🗂️",style:"g-set",pkg:"com.android.documentsui"};
+  var f={nom:"Fichiers",sous:"Stockage",ic:"🗂️",style:"g-set",pkgs:["com.android.documentsui","com.cyanogenmod.filemanager","org.lineageos.filemanager"]};
   var d=document.createElement("div");d.className="tile g-set";
   d.innerHTML='<div class="ic">'+f.ic+'</div><div><div class="t">'+f.nom+'</div><div class="s">'+f.sous+'</div></div>';
   d.onclick=function(){openApp(f)};box.appendChild(d);
@@ -294,10 +322,16 @@ function tick(){
   var done=store(key);
   $("ttstatus").innerHTML = done ? "✅ <b>Vidéo du jour publiée</b>" :
     (publishedToday ? "⏰ Vidéo du jour pas encore cochée · touche ici quand c'est publié" : "Publication quotidienne à "+CONFIG.heurePublication+" h 00 · touche quand c'est fait");
-  renderWeek();
+  // La semaine ne se redessine que si le jour a changé
+  if(tick._day!==n.toDateString()){ tick._day=n.toDateString(); renderWeek(); }
 }
-$("ttstatus").onclick=function(){var k="pub-"+new Date().toDateString();store(k,!store(k));tick();toast(store(k)?"Bravo, vidéo publiée 🎉":"Statut réinitialisé")};
-tick(); setInterval(tick,10000);
+$("ttstatus").onclick=function(){var k="pub-"+new Date().toDateString();store(k,!store(k));tick._day=null;tick();toast(store(k)?"Bravo, vidéo publiée 🎉":"Statut réinitialisé")};
+// Mise à jour une fois par minute, pile au changement de minute ; en pause quand une autre app est ouverte
+var tickTimer=null;
+function scheduleTick(){ clearTimeout(tickTimer); if(document.hidden) return;
+  tick(); var n=new Date(); tickTimer=setTimeout(scheduleTick,60000-n.getSeconds()*1000-n.getMilliseconds()+50); }
+document.addEventListener("visibilitychange",scheduleTick);
+scheduleTick();
 
 function renderWeek(){
   var box=$("week"); if(!box) return; box.innerHTML="";
@@ -337,7 +371,7 @@ $("saveCity").onclick=function(){
       $("modal").classList.remove("on"); loadWeather(); toast("Météo : "+r.name);
     }).catch(function(){toast("Pas de connexion")});
 };
-loadWeather(); setInterval(loadWeather,30*60000);
+loadWeather(); setInterval(function(){ if(!document.hidden) loadWeather(); },30*60000);
 
 /* ---------- Listes (sauvegardées sur la tablette) ---------- */
 var current="idees";
