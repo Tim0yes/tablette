@@ -67,6 +67,11 @@
   .g-cam{background:#2c5fc4}
   .g-store{background:#0e8f66}
   .g-web{background:#4c4fd0}
+  .g-chrome{background:#f1f3f4;color:#202124}
+  .chrome{display:inline-block;width:32px;height:32px;border-radius:50%;
+    background:conic-gradient(from -60deg,#db4437 0 120deg,#0f9d58 0 240deg,#f4b400 0 360deg);position:relative}
+  .chrome::after{content:"";position:absolute;inset:9px;border-radius:50%;background:#4285f4;box-shadow:0 0 0 3px #fff}
+  .ver{opacity:.6}
   .g-set{background:#2e2e3e}
 
   /* ---------- Colonne Etsy + listes ---------- */
@@ -138,7 +143,7 @@
     <div class="spacer"></div>
     <div class="brand">
       <div class="name">Console <span>1fo.utile</span></div>
-      <div class="sub" id="greet">Bonjour</div>
+      <div class="sub"><span id="greet">Bonjour</span> · <span class="ver" id="ver"></span></div>
     </div>
   </div>
 
@@ -215,7 +220,7 @@ var CONFIG = {
     {nom:"Etsy",          sous:"Ma boutique",      ic:"🧡", style:"g-etsy",   pkgs:[], web:"https://www.etsy.com/your/shops/me"},
     {nom:"Caméra",        sous:"Prendre une photo",ic:"📷", style:"g-cam",    pkgs:["net.sourceforge.opencamera"], actions:["android.media.action.STILL_IMAGE_CAMERA"]},
     {nom:"Play Store",    sous:"Applications",     ic:"▶",  style:"g-store",  pkgs:["com.android.vending"], web:"https://play.google.com/store/apps"},
-    {nom:"Navigateur",    sous:"Google Chrome",    ic:"🌐", style:"g-web",    pkgs:["com.android.chrome","org.lineageos.jelly"], web:"https://www.google.fr"},
+    {nom:"Chrome",        sous:"Navigateur",       ic:'<span class="chrome"></span>', style:"g-chrome", pkgs:["com.android.chrome","org.lineageos.jelly"], web:"https://www.google.fr"},
     {nom:"Réglages",      sous:"Tablette",         ic:"⚙️", style:"g-set",    pkgs:["com.android.settings"], actions:["android.settings.SETTINGS"]}
   ],
   // Navigateur utilisé pour les raccourcis (Commandes, Stats…)
@@ -223,8 +228,26 @@ var CONFIG = {
 };
 /* ========================================================= */
 
+var VERSION = "v4 · 14 nov.";   // ← à changer à chaque mise à jour
+
 var $ = function(id){return document.getElementById(id)};
 var isAndroid = /Android/i.test(navigator.userAgent);
+$("ver").textContent = VERSION;
+
+/* ---------- Mise à jour automatique ----------
+   Toutes les 5 min, la console regarde si une nouvelle version est en ligne
+   et se recharge toute seule (en contournant la mémoire cache). */
+function checkUpdate(){
+  if(document.hidden) return;
+  fetch(location.pathname+"?nc="+Date.now(),{cache:"no-store"})
+    .then(function(r){return r.text()})
+    .then(function(t){
+      var m=t.match(/var VERSION = "([^"]+)"/);
+      if(m && m[1]!==VERSION) location.replace(location.pathname+"?v="+encodeURIComponent(m[1]));
+    }).catch(function(){});
+}
+setInterval(checkUpdate,5*60000);
+setTimeout(checkUpdate,15000);
 
 function store(k,v){try{ if(v===undefined) return JSON.parse(localStorage.getItem(k)); localStorage.setItem(k,JSON.stringify(v)); }catch(e){ return null; }}
 function toast(msg){var t=$("toast");t.textContent=msg;t.classList.add("on");clearTimeout(toast._t);toast._t=setTimeout(function(){t.classList.remove("on")},2200)}
