@@ -53,6 +53,10 @@ sur une **Samsung Galaxy Tab A 2016 (SM-T280)** fixée comme console centrale.
 - HA doit autoriser l'origine `https://tim0yes.github.io` (CORS, Réglages → Système → Réseau).
 - Réponses de Claude = champ **description** de l'élément, affiché sous l'idée avec 🤖. Tâche programmée `reponses-listes-tablette` (tous les jours 9 h, sur le PC, app Claude ouverte).
 
+## Économie (préférence de l'utilisateur)
+- Pour chercher / lire des fichiers, déléguer à un agent **Haiku** (« commis », `model: haiku`) ; Opus garde les modifications et vérifications.
+- Exception : lecture courte d'un passage connu de `index.html` — la faire directement (un agent coûte plus cher qu'une petite lecture).
+
 ## Historique
 - Premier support envisagé : iPad 2 (A1395), abandonné (ne s'allume plus).
 - La version locale `file:///sdcard/console.html` existe encore sur la tablette mais n'est plus utilisée.
